@@ -32,9 +32,7 @@ class _HomePageState extends State<HomePage> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            floating: true,
             pinned: true,
-            snap: true,
             title: Text("Awesome App"),
             expandedHeight: 250,
             actions: [
@@ -52,6 +50,40 @@ class _HomePageState extends State<HomePage> {
               background: Image.network(RANDOM_IMAGE_URL_HEADER),
             ),
           ),
+          true ? SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              childAspectRatio: 0.8,
+            ),
+            delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                return Container(
+                  alignment: Alignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                          flex: 4,
+                          child: Container(
+                              child: Image.network(RANDOM_IMAGE_URL_ITEM)
+                          )
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                            style: TextStyles.medium,
+                            textAlign: TextAlign.center,
+                          )
+                      )
+                    ],
+                  ),
+                );
+              },
+              childCount: 30,
+            ),
+          ) :
           SliverList(
             key: UniqueKey(),
             delegate: SliverChildBuilderDelegate(
