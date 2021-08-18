@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
       pagingController: _pagingController,
       builderDelegate: PagedChildBuilderDelegate<Photos>(
         itemBuilder: (context, item, index) => _containerItem(
-            index,
+            item,
             Container(
                 margin: EdgeInsets.all(20),
                 alignment: Alignment.topLeft,
@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                     Expanded(
                         flex: 2,
                         child: Text(
-                          "by ${item.photographer}",
+                          "Photo by ${item.photographer}",
                           style: TextStyles.medium,
                         ))
                   ],
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
       ),
       builderDelegate: PagedChildBuilderDelegate<Photos>(
         itemBuilder: (context, item, index) => _containerItem(
-            index,
+            item,
             Container(
               alignment: Alignment.center,
               child: Column(
@@ -149,12 +149,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _containerItem(int index, Widget child) {
-    var imgUrl = _curatedController.curatedValue().photos[index].src.medium;
+  _containerItem(Photos photo, Widget child) {
     return InkWell(
       child: child,
       onTap: () {
-        var target = DetailPage(imgUrl: imgUrl);
+        var target = DetailPage(photo);
         Get.to(() => target);
       },
     );
