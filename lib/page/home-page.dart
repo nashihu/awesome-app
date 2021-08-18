@@ -1,10 +1,12 @@
 import 'package:awesome_app/controller/curated-controller.dart';
 import 'package:awesome_app/controller/view-mode-controller.dart';
+import 'package:awesome_app/model/curated.dart';
 import 'package:awesome_app/page/detail-page.dart';
 import 'package:awesome_app/util/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../util/constants.dart';
 
@@ -16,16 +18,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   late ViewModeController _viewModeController;
   late CuratedController _curatedController;
 
+  late PagingController<int, Photos> _pagingController;
+
   @override
   void initState() {
+    _pagingController = Get.find();
     _viewModeController = Get.find();
     _curatedController = Get.find();
     _curatedController.getCuratedItems(1);
+    _pagingController.addPageRequestListener((pageKey) {
+      _curatedController.getCuratedItems(pageKey);
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -36,8 +49,8 @@ class _HomePageState extends State<HomePage> {
           _sliverHeader(),
           Obx(() => _curatedController.isDataReceived()
               ? _viewModeController.isListMode()
-              ? _listView()
-              : _gridView()
+                  ? _listView()
+                  : _gridView()
               : _handleDataOnHold())
         ],
       ),
@@ -71,78 +84,69 @@ class _HomePageState extends State<HomePage> {
   }
 
   _listView() {
-    return Obx(() => SliverList(
-      delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-          return _containerItem(
-              index,
-              Container(
-                  margin: EdgeInsets.all(20),
-                  alignment: Alignment.topLeft,
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                          flex: 1,
-                          child: Container(
-                              margin: EdgeInsets.only(right: 20),
-                              child: Image.network(_curatedController.curatedValue()
-                                  .photos[index]
-                                  .src
-                                  .landscape))),
-                      Expanded(
-                          flex: 2,
-                          child: Text(
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                            style: TextStyles.medium,
-                          ))
-                    ],
-                  )));
-        },
-        childCount: _curatedController.curatedValue().photos.length,
+    return PagedSliverList<int, Photos>(
+      pagingController: _pagingController,
+      builderDelegate: PagedChildBuilderDelegate<Photos>(
+        itemBuilder: (context, item, index) => _containerItem(
+            index,
+            Container(
+                margin: EdgeInsets.all(20),
+                alignment: Alignment.topLeft,
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                        flex: 1,
+                        child: Container(
+                            margin: EdgeInsets.only(right: 20),
+                            child: Image.network(item.src.landscape))),
+                    Expanded(
+                        flex: 2,
+                        child: Text(
+                          "by ${item.photographer}",
+                          style: TextStyles.medium,
+                        ))
+                  ],
+                ))),
       ),
-    ));
+    );
   }
 
   _gridView() {
-    return Obx(() {
-      return SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 10.0,
-          crossAxisSpacing: 10.0,
-          childAspectRatio: 0.8,
-        ),
-        delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-            return _containerItem(
-                index,
-                Container(
-                  alignment: Alignment.center,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                          flex: 4,
-                          child: Container(
-                              child: Image.network(
-                                  _curatedController.curatedValue().photos[index].src.medium))),
-                      Expanded(
-                          flex: 1,
-                          child: Text(
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                            style: TextStyles.medium,
-                            textAlign: TextAlign.center,
-                          ))
-                    ],
-                  ),
-                ));
-          },
-          childCount: _curatedController.curatedValue().photos.length,
-        ),
-      );
-    });
+    return PagedSliverGrid<int, Photos>(
+      pagingController: _pagingController,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10.0,
+        crossAxisSpacing: 10.0,
+        childAspectRatio: 0.8,
+      ),
+      builderDelegate: PagedChildBuilderDelegate<Photos>(
+        itemBuilder: (context, item, index) => _containerItem(
+            index,
+            Container(
+              alignment: Alignment.center,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                      flex: 4,
+                      child: Container(
+                        child: Image.network(item.src.medium),
+                      )),
+                  Expanded(
+                      flex: 1,
+                      child: Text(
+                        "Photo by ${item.photographer}",
+                        style: TextStyles.medium,
+                        textAlign: TextAlign.center,
+                      ))
+                ],
+              ),
+            )),
+      ),
+    );
   }
 
   _containerItem(int index, Widget child) {
