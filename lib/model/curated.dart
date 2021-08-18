@@ -8,16 +8,16 @@ class Curated {
   Curated();
 
   Curated.fromJson(Map<String, dynamic> json) {
-    page = json['page'];
-    perPage = json['per_page'];
+    page = json['page'] ?? 0;
+    perPage = json['per_page'] ?? 0;
     if (json['photos'] != null) {
       photos = [];
       json['photos'].forEach((v) {
         photos.add(new Photos.fromJson(v));
       });
     }
-    totalResults = json['total_results'];
-    nextPage = json['next_page'];
+    totalResults = json['total_results'] ?? 0;
+    nextPage = json['next_page'] ?? "";
   }
 
   Map<String, dynamic> toJson() {

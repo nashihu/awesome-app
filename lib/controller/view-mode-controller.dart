@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
 
 class ViewModeController extends GetxController {
-  var listMode = true.obs;
-  toggleView(bool value) => listMode.value = value;
+  var _listMode = true.obs;
+
+  void toggleView(bool value) => _listMode.value = value;
+
+  bool isListMode() => _listMode.value;
 }

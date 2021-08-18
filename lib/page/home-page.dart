@@ -1,6 +1,5 @@
 import 'package:awesome_app/controller/curated-controller.dart';
 import 'package:awesome_app/controller/view-mode-controller.dart';
-import 'package:awesome_app/model/curated.dart';
 import 'package:awesome_app/page/detail-page.dart';
 import 'package:awesome_app/util/styles.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,8 +22,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    _viewModeController = Get.put(ViewModeController());
-    _curatedController = Get.put(CuratedController());
+    _viewModeController = Get.find();
+    _curatedController = Get.find();
     _curatedController.getCuratedItems(1);
     super.initState();
   }
@@ -35,8 +34,8 @@ class _HomePageState extends State<HomePage> {
       body: CustomScrollView(
         slivers: [
           _sliverHeader(),
-          Obx(() => _isDataReceived()
-              ? _isListMode()
+          Obx(() => _curatedController.isDataReceived()
+              ? _viewModeController.isListMode()
               ? _listView()
               : _gridView()
               : _handleDataOnHold())
@@ -53,14 +52,14 @@ class _HomePageState extends State<HomePage> {
       actions: [
         IconButton(
             onPressed: () {
-              _toggleViewMode(false);
+              _viewModeController.toggleView(false);
             },
-            icon: Obx(() => _gridIcon(_isListMode()))),
+            icon: Obx(() => _gridIcon(_viewModeController.isListMode()))),
         IconButton(
             onPressed: () {
-              _toggleViewMode(true);
+              _viewModeController.toggleView(true);
             },
-            icon: Obx(() => _listIcon(_isListMode()))),
+            icon: Obx(() => _listIcon(_viewModeController.isListMode()))),
         SizedBox(
           width: 10,
         ),
@@ -88,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                           flex: 1,
                           child: Container(
                               margin: EdgeInsets.only(right: 20),
-                              child: Image.network(_curatedValue()
+                              child: Image.network(_curatedController.curatedValue()
                                   .photos[index]
                                   .src
                                   .landscape))),
@@ -101,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   )));
         },
-        childCount: _curatedValue().photos.length,
+        childCount: _curatedController.curatedValue().photos.length,
       ),
     ));
   }
@@ -128,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                           flex: 4,
                           child: Container(
                               child: Image.network(
-                                  _curatedValue().photos[index].src.medium))),
+                                  _curatedController.curatedValue().photos[index].src.medium))),
                       Expanded(
                           flex: 1,
                           child: Text(
@@ -140,14 +139,14 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ));
           },
-          childCount: _curatedValue().photos.length,
+          childCount: _curatedController.curatedValue().photos.length,
         ),
       );
     });
   }
 
   _containerItem(int index, Widget child) {
-    var imgUrl = _curatedValue().photos[index].src.medium;
+    var imgUrl = _curatedController.curatedValue().photos[index].src.medium;
     return InkWell(
       child: child,
       onTap: () {
@@ -155,14 +154,6 @@ class _HomePageState extends State<HomePage> {
         Get.to(() => target);
       },
     );
-  }
-
-  _toggleViewMode(bool value) {
-    _viewModeController.toggleView(value);
-  }
-
-  _isListMode() {
-    return _viewModeController.listMode.value;
   }
 
   _gridIcon(bool isListActive) {
@@ -175,24 +166,8 @@ class _HomePageState extends State<HomePage> {
         color: isListActive ? Colors.black : Colors.grey);
   }
 
-  _isLoading() {
-    return _curatedController.isLoading.value;
-  }
-
-  String _errorMessage() {
-    return _curatedController.errorMessage.value;
-  }
-
-  Curated _curatedValue() {
-    return _curatedController.listItem.value;
-  }
-
-  bool _isDataReceived() {
-    return !_isLoading() && _errorMessage().isEmpty;
-  }
-
   Widget _handleDataOnHold() {
-    if (_isLoading()) {
+    if (_curatedController.isFetching()) {
       return SliverGrid.count(
         crossAxisCount: 1,
         children: [
@@ -213,7 +188,7 @@ class _HomePageState extends State<HomePage> {
         Container(
           width: MediaQuery.of(context).size.width * 0.7,
           child: Center(
-            child: Text(_errorMessage()),
+            child: Text(_curatedController.errorMessage()),
           ),
         ),
       ],

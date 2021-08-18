@@ -3,32 +3,40 @@ import 'package:awesome_app/repository/repository.dart';
 import 'package:get/get.dart';
 
 class CuratedController extends GetxController {
-  var listItem = Curated().obs;
-  var isLoading = true.obs;
-  var errorMessage = "".obs;
+  var _listItem = Curated().obs;
+  var _isLoading = true.obs;
+  var _errorMessage = "".obs;
 
-  Repository? _repository;
+  late Repository _repository;
 
-  void getCuratedItems(int page, {int perPage = 10}) async {
-    if(_repository == null) {
-      _repository = Get.put(Repository());
-    }
+  CuratedController() {
+    _repository = Get.find();
+  }
 
+  Future<void> getCuratedItems(int page, {int perPage = 10}) async {
     Curated? _value;
 
     try {
-      _value = await _repository?.getCurated(page, perPage);
+      _value = await _repository.getCurated(page, perPage);
     } catch (e,x) {
-      errorMessage.value = x.toString();
+      _errorMessage.value = x.toString();
       e.printError();
       x.printError();
     }
 
-    isLoading.value = false;
+    _isLoading.value = false;
 
     if(_value != null) {
-      listItem.value = _value;
+      _listItem.value = _value;
     }
 
   }
+
+  Curated curatedValue() => _listItem.value;
+
+  String errorMessage() => _errorMessage.value;
+
+  bool isFetching() => _isLoading.value;
+
+  bool isDataReceived() => !isFetching() && errorMessage().isEmpty;
 }
