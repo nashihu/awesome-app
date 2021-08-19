@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:awesome_app/model/curated.dart';
 import 'package:awesome_app/repository/repository.dart';
+import 'package:awesome_app/util/constants.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
@@ -42,6 +45,23 @@ class CuratedController extends GetxController {
 
     _isLoading.value = false;
 
+  }
+
+  void resetState() {
+    _errorMessage.value = "";
+    _isLoading.value = true;
+    _pagingController.itemList = null;
+  }
+  
+  String getRandomPhotoHeaderUrl() {
+    if(_pagingController.itemList == null) {
+      return RANDOM_IMAGE_URL_HEADER;
+    }
+
+    int size = _pagingController.itemList!.length;
+    int randomIdx = Random().nextInt(size);
+    
+    return _pagingController.itemList![randomIdx].src.landscape;
   }
 
   String errorMessage() => _errorMessage.value;
