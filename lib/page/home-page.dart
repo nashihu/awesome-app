@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:awesome_app/controller/curated-controller.dart';
 import 'package:awesome_app/controller/view-mode-controller.dart';
-import 'package:awesome_app/main.dart';
 import 'package:awesome_app/model/curated.dart';
 import 'package:awesome_app/page/detail-page.dart';
+import 'package:awesome_app/util/static-helper.dart';
 import 'package:awesome_app/util/styles.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -61,8 +61,8 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      if (isFirstOpen) {
-        isFirstOpen = false;
+      if (Helpers.isFirstOpen) {
+        Helpers.isFirstOpen = false;
         return;
       }
 
@@ -110,10 +110,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () => Future.sync(
-          () {
-            _photosController.resetState();
-            return _pagingController.refresh();
-          },
+          () => _photosController.resetState(),
         ),
         child: CustomScrollView(
           slivers: [
@@ -189,10 +186,11 @@ class _HomePageState extends State<HomePage> {
 
   _listView() {
     return PagedSliverList<int, Photos>(
+      key: Key("List View"),
       pagingController: _pagingController,
       builderDelegate: PagedChildBuilderDelegate<Photos>(
         itemBuilder: (context, item, index) => _containerItem(
-            item,
+            Key("Photo List $index"),item,
             Container(
                 margin: EdgeInsets.all(20),
                 alignment: Alignment.topLeft,
@@ -234,6 +232,7 @@ class _HomePageState extends State<HomePage> {
 
   _gridView() {
     return PagedSliverGrid<int, Photos>(
+      key: Key("Grid View"),
       pagingController: _pagingController,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -241,7 +240,7 @@ class _HomePageState extends State<HomePage> {
       ),
       builderDelegate: PagedChildBuilderDelegate<Photos>(
         itemBuilder: (context, item, index) => _containerItem(
-            item,
+            Key("Photo Grid $index"),item,
             Container(
               alignment: Alignment.center,
               child: Column(
@@ -287,8 +286,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _containerItem(Photos photo, Widget child) {
+  _containerItem(Key key, Photos photo, Widget child) {
     return InkWell(
+      key: key,
       child: child,
       onTap: () {
         var target = DetailPage(photo);
@@ -310,6 +310,7 @@ class _HomePageState extends State<HomePage> {
   Widget _handleDataOnHold() {
     if (_photosController.isFetching()) {
       return SliverGrid.count(
+        key: Key("Loading List"),
         crossAxisCount: 1,
         children: [
           Center(

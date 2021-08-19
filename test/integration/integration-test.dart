@@ -14,7 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 
 import 'integration-test.mocks.dart';
-import 'integration/constants.dart';
+import 'constants.dart';
 
 @GenerateMocks([http.Client])
 void main() {

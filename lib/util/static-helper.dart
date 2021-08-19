@@ -9,6 +9,8 @@ class Helpers {
 
   }
 
+  static bool isFirstOpen = true;
+
   static Future<bool> hasNetworkConnection() async {
     try {
       var connectivityResult = await (Connectivity().checkConnectivity());

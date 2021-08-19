@@ -35,6 +35,7 @@ class _DetailPageState extends State<DetailPage> {
     height = MediaQuery.of(context).size.height * 0.7;
     return Scaffold(
       body: CustomScrollView(
+        key: Key("Detail Page"),
         slivers: [
           SliverAppBar(
             title: Text("Photo by ${photo.photographer}",
