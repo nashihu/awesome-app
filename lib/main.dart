@@ -16,11 +16,11 @@ const awesomeApp = GetMaterialApp(
     home: HomePage());
 
 void injectObjects() {
-  Get.put(http.Client());
-  Get.put(Repository(Get.find()));
-  Get.put(ViewModeController());
-  Get.put(PagingController<int,Photos>(firstPageKey: 0));
-  Get.put(CuratedController());
+  Get.lazyPut(() => http.Client());
+  Get.lazyPut(() => (Repository(Get.find())));
+  Get.lazyPut(() => (ViewModeController()));
+  Get.lazyPut(() => (PagingController<int,Photos>(firstPageKey: 0)));
+  Get.lazyPut(() => (CuratedController()));
 }
 
 void main() {

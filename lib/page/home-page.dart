@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late ViewModeController _viewModeController;
-  late CuratedController _curatedController;
+  late CuratedController _photosController;
 
   late PagingController<int, Photos> _pagingController;
 
@@ -27,10 +27,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     _pagingController = Get.find();
     _viewModeController = Get.find();
-    _curatedController = Get.find();
-    _curatedController.getCuratedItems(1);
+    _photosController = Get.find();
+    _photosController.getPhotos(0);
     _pagingController.addPageRequestListener((pageKey) {
-      _curatedController.getCuratedItems(pageKey);
+      _photosController.getPhotos(pageKey);
     });
     super.initState();
   }
@@ -44,15 +44,20 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _sliverHeader(),
-          Obx(() => _curatedController.isDataReceived()
-              ? _viewModeController.isListMode()
-                  ? _listView()
-                  : _gridView()
-              : _handleDataOnHold())
-        ],
+      body: RefreshIndicator(
+        onRefresh: () => Future.sync(
+              () => _pagingController.refresh(),
+        ),
+        child: CustomScrollView(
+          slivers: [
+            _sliverHeader(),
+            Obx(() => _photosController.isDataReceived()
+                ? _viewModeController.isListMode()
+                    ? _listView()
+                    : _gridView()
+                : _handleDataOnHold())
+          ],
+        ),
       ),
     );
   }
@@ -170,7 +175,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _handleDataOnHold() {
-    if (_curatedController.isFetching()) {
+    if (_photosController.isFetching()) {
       return SliverGrid.count(
         crossAxisCount: 1,
         children: [
@@ -191,7 +196,7 @@ class _HomePageState extends State<HomePage> {
         Container(
           width: MediaQuery.of(context).size.width * 0.7,
           child: Center(
-            child: Text(_curatedController.errorMessage()),
+            child: Text(_photosController.errorMessage()),
           ),
         ),
       ],

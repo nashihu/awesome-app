@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class CuratedController extends GetxController {
-  var _listItem = Curated().obs;
   var _isLoading = true.obs;
   var _errorMessage = "".obs;
   static const _pageSize = 20;
@@ -17,8 +16,11 @@ class CuratedController extends GetxController {
     _pagingController = Get.find();
   }
 
-  Future<void> getCuratedItems(int page, {int perPage = _pageSize}) async {
+  Future<void> getPhotos(int page, {int perPage = _pageSize}) async {
     Curated? _value;
+    if(page==0) {
+      page = 1;
+    }
 
     try {
       _value = await _repository.getCurated(page, perPage);
@@ -28,16 +30,9 @@ class CuratedController extends GetxController {
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
       } else {
-        final nextPageKey = page + newItems.length;
-        _pagingController.appendPage(newItems, nextPageKey);
+        _pagingController.appendPage(newItems, page+1);
       }
-      var photos = _listItem.value.photos;
-      photos.addAll(newItems);
 
-      var prevCurated = curatedValue();
-      prevCurated.photos = photos;
-
-      _listItem.value = prevCurated;
     } catch (e,x) {
       _errorMessage.value = e.toString();
       _pagingController.error = e.toString();
@@ -48,8 +43,6 @@ class CuratedController extends GetxController {
     _isLoading.value = false;
 
   }
-
-  Curated curatedValue() => _listItem.value;
 
   String errorMessage() => _errorMessage.value;
 

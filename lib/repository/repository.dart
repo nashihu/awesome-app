@@ -16,12 +16,7 @@ class Repository {
   }
 
   Future<Curated> getCurated(int pageKey, int perPage) async {
-    int page = 1;
-    if(pageKey != 1) {
-      page = ((pageKey - 1)~/perPage)+1;
-    }
-    // print("next pageKey: $pageKey next page $page");
-    String path = "$baseUrl/curated?page=$page&per_page=$perPage";
+    String path = "$baseUrl/curated?page=$pageKey&per_page=$perPage";
     print("url: $path");
     Uri uri = Uri.parse(path);
     var response = await _http.get(uri, headers: _headers);
