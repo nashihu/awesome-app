@@ -14,6 +14,9 @@ class CacheService {
 
   Future<Curated> getCurated(String url) async {
     String cached = await _pref.getString(url) ?? "";
+    if(cached.isEmpty) {
+      throw Exception("wrong implementation");
+    }
     return Curated.fromJson(jsonDecode(cached));
   }
 

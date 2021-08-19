@@ -26,6 +26,17 @@ class Const {
         }
   """;
 
+  static const pageSinglePhoto = """
+  {
+    "page": 1,
+    "per_page": 1,
+    "photos": [$singlePhoto],
+    "total_results": 8000,
+    "next_page": "https://api.pexels.com/v1/curated/?page=2&per_page=20"
+    }
+        
+  """;
+
   static const firstPage = """
   {
     "page": 1,

@@ -25,10 +25,11 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
 
-import '../integration/constants.dart';
-import '../integration/integration-test.mocks.dart';
+import '../util/constants.dart';
+import '../util/mock-helper.mocks.dart';
 
 void main() {
+  print("running ui test");
   Get.put(LocalPreference());
   Get.put(CacheService());
   Get.put(ApiService());

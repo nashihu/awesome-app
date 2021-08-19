@@ -9,15 +9,14 @@ import 'package:awesome_app/util/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:mockito/annotations.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 
-import 'integration-test.mocks.dart';
-import 'constants.dart';
+import '../util/constants.dart';
+import '../util/mock-helper.mocks.dart';
 
-@GenerateMocks([http.Client])
 void main() {
+  print("running curated controller test");
   Get.put(LocalPreference());
   Get.put(CacheService());
   Get.put(ApiService());
